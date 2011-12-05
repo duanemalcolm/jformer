@@ -1,3 +1,8 @@
+class Date():
+    
+    def __init__(self, id):
+        self.id = id
+
 #class JFormComponentDate extends JFormComponentSingleLineText:
 #    /*
 #     * Constructor
@@ -132,3 +137,5 @@
 #}
 #
 #?>
+if __name__ == '__main__':
+    main()
