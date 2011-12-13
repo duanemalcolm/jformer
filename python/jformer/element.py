@@ -30,7 +30,7 @@ class Element():
             self.attributeArray.update(attribute)
         
     def addToAttribute(self, attribute, value = ''):
-        if self.attributeArray[attribute]:
+        if self.attributeArray.has_key(attribute):
             currentValue = self.attributeArray[attribute] + ' '
         else:
             currentValue = ''
@@ -65,7 +65,8 @@ class Element():
         ***
         
         '''
-        self.innerHtml = obj
+        #~ self.innerHtml = obj # was this
+        self.innerHtml = [obj]
         
     def build(self):
         '''

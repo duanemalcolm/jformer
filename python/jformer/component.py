@@ -1,3 +1,5 @@
+from element import Element
+
 class _Component():
     '''
     An abstract Form Component object, should not be instantiated
@@ -161,116 +163,109 @@ class _Component():
 #~         
 #~         self.validationOptions = reformedValidations
 #~     
-#
-#~     def getOptions():
-#~         options = {
-#~         options['options'] = {
-#~         options['type'] = get_class(this)
-#
-#~         # Validation options
-#~         if(!empty(self.validationOptions)):
-#~             options['options']['validationOptions'] = self.validationOptions
-#~         
-#~         if(self.showErrorTipOnce):
-#~             options['options']['showErrorTipOnce'] = self.showErrorTipOnce
-#~         
-#
-#~         if(self.persistentTip){
-#~             options['options']['persistentTip'] = self.persistentTip
-#~         
-#~         
-#~         # Instances
-#~         if(!empty(self.instanceOptions)):
-#~             options['options']['instanceOptions'] = self.instanceOptions
-#~             if(!isset(options['options']['instanceOptions']['addButtonText'])):
-#~                 options['options']['instanceOptions']['addButtonText'] = 'Add Another'
-#~             
-#~             if(!isset(options['options']['instanceOptions']['removeButtonText'])):
-#~                 options['options']['instanceOptions']['removeButtonText'] = 'Remove'
-#~             
-#~         
-#~         
-#~         
-#~         # Trigger
-#~         if(!empty(self.triggerFunction)):
-#~             options['options']['triggerFunction'] = self.triggerFunction
-#~         
-#~         
-#~         # Dependencies
-#~         if(!empty(self.dependencyOptions)):
-#~             # Make sure the dependentOn key is tied to an array
-#~             if(isset(self.dependencyOptions['dependentOn']) && !is_array(self.dependencyOptions['dependentOn'])):
-#~                 self.dependencyOptions['dependentOn'] = array(self.dependencyOptions['dependentOn'])
-#~             
-#~             options['options']['dependencyOptions'] = self.dependencyOptions
-#~         
-#~         
-#~         # Clear the options key if there is nothing in it
-#~         if(empty(options['options'])):
-#~             unset(options['options'])
-#~         
-#
-#~         return options
-#~     
-#
-#~     /**
-#~      * Generates the HTML for the FormComponent
-#~      * @return string
-#~      */
-#~     abstract def __toString()
-#~     
-#~     def hasInstanceValues():
-#~         return is_array(self.value)
-#~     
-#
-    #~ def generateComponentDiv(includeLabel = True):
-        #~ # Div tag contains everything about the component
-        #~ componentDiv = Element('div', {
-            #~ 'id':self.id.'-wrapper',
-            #~ 'class':'jFormComponent '+self._class)
-#~ 
-        #~ # This causes issues with things that are dependent and should display by default
-        #~ # If the component has dependencies and the display type is hidden, hide by default
-        #~ #if(self.dependencyOptions !== None && isset(self.dependencyOptions['display']) && self.dependencyOptions['display'] == 'hide'):
-        #~ #    componentDiv.setAttribute('style', 'display: none')
-        #~ #
-#~ 
-        #~ # Style
-        #~ if self.style:
-            #~ componentDiv.addToAttribute('style', self.style)
-#~ 
-        #~ # Label tag
-        #~ if includeLabel:
-            #~ label = self.generateComponentLabel()
-            #~ componentDiv.insert(label)
-#~ 
-        #~ return componentDiv
 
-#~     def updateRequiredText(requiredText):
-#~         self.requiredText = requiredText
-#~     
-#
-    #~ def generateComponentLabel():
-        #~ if self.label == None:
-            #~ return ''
-#~ 
-        #~ label = Element('label', {
-            #~ 'id':self.id+'-label',
-            #~ 'for':self.id,
-            #~ 'class':self.labelClass
-            #~ )
-            #~ 
-        #~ label.update(self.label)
-        #~ 
-        #~ # Add the required star to the label
-        #~ if 'required' in self.validationOptions:
-            #~ labelRequiredStarSpan = Element('span', {
-                #~ 'class':self.labelRequiredStarClass
-            #~ )
-            #~ labelRequiredStarSpan.update(self.requiredText)
-            #~ label.insert(labelRequiredStarSpan)
-#~ 
-        #~ return label
+    def getOptions(self):
+        options = {}
+        options['options'] = {}
+        
+        ### DM: not sure
+        #~ options['type'] = get_class(this)
+        options['type'] = self._class
+        
+        # Validation options
+        if self.validationOptions:
+            options['options']['validationOptions'] = self.validationOptions
+        
+        if self.showErrorTipOnce:
+            options['options']['showErrorTipOnce'] = self.showErrorTipOnce
+        
+        if self.persistentTip:
+            options['options']['persistentTip'] = self.persistentTip
+        
+        # Instances
+        if self.instanceOptions:
+            options['options']['instanceOptions'] = self.instanceOptions
+            if not options['options']['instanceOptions'].has_key('addButtonText'):
+                options['options']['instanceOptions']['addButtonText'] = 'Add Another'
+            
+            if not options['options']['instanceOptions'].has_key('removeButtonText'):
+                options['options']['instanceOptions']['removeButtonText'] = 'Remove'
+        
+        # Trigger
+        if self.triggerFunction:
+            options['options']['triggerFunction'] = self.triggerFunction
+        
+        
+        # Dependencies
+        if self.dependencyOptions:
+            # Make sure the dependentOn key is tied to an array
+            if self.dependencyOptions.has_key('dependentOn') and not isinstance(self.dependencyOptions['dependentOn'], list):
+                self.dependencyOptions['dependentOn'] = [self.dependencyOptions['dependentOn']]
+            
+            options['options']['dependencyOptions'] = self.dependencyOptions
+        
+        # Clear the options key if there is nothing in it
+        if not options['options']:
+            options.pop('options')
+        
+        return options
+    
+    def hasInstanceValues(self):
+        return isinstance(self.value, list)
+    
+
+#     /**
+#      * Generates the HTML for the FormComponent
+#      * @return string
+#      */
+#     abstract def __toString()
+    
+    def generateComponentDiv(self, includeLabel=True):
+        # Div tag contains everything about the component
+        componentDiv = Element('div', {
+            'id': self.id+'-wrapper',
+            'class': 'jFormComponent '+self._class})
+
+        # This causes issues with things that are dependent and should display by default
+        # If the component has dependencies and the display type is hidden, hide by default
+        # if(self.dependencyOptions !== None && isset(self.dependencyOptions['display']) && self.dependencyOptions['display'] == 'hide'):
+        #    componentDiv.setAttribute('style', 'display: none')
+        #
+
+        # Style
+        if self.style:
+            componentDiv.addToAttribute('style', self.style)
+
+        # Label tag
+        if includeLabel:
+            label = self.generateComponentLabel()
+            componentDiv.insert(label)
+
+        return componentDiv
+
+    def updateRequiredText(self, requiredText):
+        self.requiredText = requiredText
+    
+    def generateComponentLabel(self):
+        if self.label == None:
+            return ''
+
+        label = Element('label', {
+            'id':self.id+'-label',
+            'for':self.id,
+            'class':self.labelClass
+            })
+            
+        label.update(self.label)
+        
+        # Add the required star to the label
+        if 'required' in self.validationOptions:
+            labelRequiredStarSpan = Element('span',
+                {'class':self.labelRequiredStarClass})
+            labelRequiredStarSpan.update(self.requiredText)
+            label.insert(labelRequiredStarSpan)
+
+        return label
 
 #~     def insertComponentDescription(div):
 #~         # Description

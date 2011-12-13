@@ -127,7 +127,7 @@ class TestElement(unittest.TestCase):
         e.insert('<p>Keep it secret</p>')
         div = jformer.Element('div')
         e.update(div)
-        self.assertEqual(div, e.innerHtml)
+        self.assertEqual(div, e.innerHtml[0])
     
     def test_build_str(self):
         e = jformer.Element('div', {'class':'bordered', 'id':'mydiv'})
@@ -193,7 +193,101 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(value, 'House')
         c.clearValue()
         self.assertEqual(c.value, None)
-
+    
+    def test_get_options_empty(self):
+        c = jformer._Component()
+        self.assertEqual(c.getOptions(), {'type': None})
+    
+    def test_get_options_validation(self):
+        c = jformer._Component()
+        c.validationOptions = ['required', 'password']
+        self.assertEqual(c.getOptions(), {'type': None,
+            'options': {'validationOptions': ['required', 'password']}})
+        
+    def test_get_options_show_error_tip_once(self):
+        c = jformer._Component()
+        c.showErrorTipOnce = True
+        self.assertEqual(c.getOptions(), {'type': None,
+            'options': {'showErrorTipOnce': True}})
+        
+    def test_get_options_persistent_tip(self):
+        c = jformer._Component()
+        c.persistentTip = True
+        self.assertEqual(c.getOptions(), {'type': None,
+            'options': {'persistentTip': True}})
+        
+    def test_get_options_instance(self):
+        c = jformer._Component()
+        c.instanceOptions = {
+            'max': 3,
+            'addButtonText': 'Add Team',
+            'removeButtonText': 'Remove Team'}
+        self.assertEqual(c.getOptions(), {'type': None,
+            'options': {'instanceOptions': {
+            'max': 3, 
+            'removeButtonText': 'Remove Team', 
+            'addButtonText': 'Add Team'}}})
+            
+    def test_get_options_trigger(self):
+        c = jformer._Component()
+        c.triggerFunction = 'addValues();'
+        self.assertEqual(c.getOptions(), {'type': None,
+            'options': {'triggerFunction': 'addValues();'}})
+        
+    def test_get_options_dependency(self):
+        c = jformer._Component()
+        c.dependencyOptions = {
+            'dependentOn': 'billing_shipping',
+            'display': 'hide',
+            'jsFunction': '$("#billing_shipping-choice1").is(":checked");'}
+        self.assertEqual(c.getOptions(), {'type': None,
+            'options': {'dependencyOptions': {
+            'dependentOn': ['billing_shipping'],
+            'display': 'hide',
+            'jsFunction': '$("#billing_shipping-choice1").is(":checked");'}}})
+    
+    def test_has_instance_values(self):
+        c = jformer._Component()
+        self.assertEqual(c.hasInstanceValues(), False)
+        c.value = '1'
+        self.assertEqual(c.hasInstanceValues(), False)
+        c.value = ['1', '2']
+        self.assertEqual(c.hasInstanceValues(), True)
+    
+    def test_update_required_text(self):
+        c = jformer._Component()
+        self.assertEqual(c.requiredText, ' *')
+        c.updateRequiredText('So like required')
+        self.assertEqual(c.requiredText, 'So like required')
+    
+    def test_generate_component_div(self):
+        c = jformer._Component()
+        setattr(c, 'id', 'magic')
+        c._class = 'blue_border'
+        self.assertEqual(c.generateComponentDiv().__str__(),
+            '<div id="magic-wrapper" class="jFormComponent blue_border"></div>')
+        c.style = 'color: blue;'
+        self.assertEqual(c.generateComponentDiv().__str__(),
+            '<div style="color: blue;" id="magic-wrapper" ' +
+            'class="jFormComponent blue_border"></div>')
+        c.label = 'Name:'
+        self.assertEqual(c.generateComponentDiv().__str__(),
+            '<div style="color: blue;" id="magic-wrapper" ' +
+            'class="jFormComponent blue_border">' +
+            '<label id="magic-label" for="magic" ' +
+            'class="jFormComponentLabel">Name:</label></div>')
+        
+    def test_generate_component_label(self):
+        c = jformer._Component()
+        setattr(c, 'id', 'magic')
+        self.assertEqual(c.generateComponentLabel(), '')
+        c.label = 'Name:'
+        self.assertEqual(c.generateComponentLabel().__str__(),
+            '<label id="magic-label" for="magic" class="jFormComponentLabel">Name:</label>')
+        c.validationOptions = ['required', 'password']
+        self.assertEqual(c.generateComponentLabel().__str__(),
+            '<label id="magic-label" for="magic" class="jFormComponentLabel">Name:<span class="jFormComponentLabelRequiredStar"> *</span></label>')
+        
 class TestTextArea(unittest.TestCase):
     """Unit tests for jformer TextArea."""
     
