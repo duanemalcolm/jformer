@@ -1,4 +1,5 @@
 from component import _Component
+from element import Element
 
 class TextArea(_Component):
     
@@ -27,80 +28,81 @@ class TextArea(_Component):
         self.autoGrow = False
 
         # Initialize the abstract FormComponent object
-        #~ self.initialize(optionArray)
-#
+        self.initialize(optionArray)
+
+#    ## DM: not sure if this is needed, it's in super class (Component)
 #    def hasInstanceValues():
 #        return is_array(self.value)
 #    }
-#
-#    def getOptions():
-#        options = parent::getOptions()
-#
-#        # Tabbing
-#        if(self.allowTabbing):
-#            options['options']['allowTabbing'] = True
-#        }
-#
-#        # Empty value
-#        if(!empty(self.emptyValue)):
-#            options['options']['emptyValue'] = self.emptyValue
-#        }
-#
-#        # Auto grow
-#        if(self.autoGrow):
-#            options['options']['autoGrow'] = self.autoGrow
-#        }
-#
-#        return options
 
-    #~ def __str__():
-        #~ # Generate the component div
-        #~ div = self.generateComponentDiv()
-#~ 
-        #~ # Add the input tag
-        #~ textArea = new JFormElement('textarea', array(
-            #~ 'id':self.id,
-            #~ 'name':self.name,
-            #~ 'class':self.inputClass,
-        #~ ))
-        #~ if(!empty(self.width)):
-            #~ if(array_key_exists(self.width, self.widthArray)):
-                #~ textArea.setAttribute('style', 'width: '.self.widthArray[self.width].'')
-            #~ }
-            #~ else:
-                #~ textArea.setAttribute('style', 'width: '.self.width.'')
-            #~ }
-        #~ }
-        #~ if(!empty(self.height)):
-            #~ if(array_key_exists(self.height, self.heightArray)):
-                #~ textArea.addToAttribute('style', 'height: '.self.heightArray[self.height].'')
-            #~ }
-            #~ else:
-                #~ textArea.addToAttribute('style', 'height: '.self.height.'')
-            #~ }
-        #~ }
-        #~ if(!empty(self.style)):
-            #~ textArea.addToAttribute('style', self.style)
-        #~ }
-        #~ if(self.disabled):
-            #~ textArea.setAttribute('disabled', 'disabled')
-        #~ }
-        #~ if(self.readOnly):
-            #~ textArea.setAttribute('readonly', 'readonly')
-        #~ }
-        #~ if(self.wrap):
-            #~ textArea.setAttribute('wrap', self.wrap)
-        #~ }
-        #~ if(!empty(self.initialValue)):
-            #~ textArea.update(self.initialValue)
-        #~ }
-        #~ div.insert(textArea)
-#~ 
-        #~ # Add any description (optional)
-        #~ div = self.insertComponentDescription(div)
-#~ 
-        #~ # Add a tip (optional)
-        #~ div = self.insertComponentTip(div)
-#~ 
-        #~ return div.__str__()
+    def getOptions(self):
+        options = _Component.getOptions(self)
+        
+        if not options.has_key('options'):
+            options['options'] = {}
+        
+        # Tabbing
+        if self.allowTabbing:
+            options['options']['allowTabbing'] = True
+        
+        # Empty value
+        if self.emptyValue:
+            options['options']['emptyValue'] = self.emptyValue
+        
+        # Auto grow
+        if self.autoGrow:
+            options['options']['autoGrow'] = self.autoGrow
+        
+        # Clear the options key if there is nothing in it
+        if not options['options']:
+            options.pop('options')
+            
+        return options
+
+    def __str__(self):
+        # Generate the component div
+        div = self.generateComponentDiv()
+
+        # Add the input tag
+        textArea = Element('textarea', {
+            'id':self.id,
+            'name':self.name,
+            'class':self.inputClass})
+        
+        if self.width:
+            if self.width in self.widthArray.keys():
+                textArea.setAttribute('style', 'width: '+self.widthArray[self.width]+'')
+            else:
+                textArea.setAttribute('style', 'width: '+str(self.width)+'')
+        
+        if self.height:
+            if self.height in self.heightArray.keys():
+                textArea.addToAttribute('style', 'height: '+self.heightArray[self.height]+'')
+            else:
+                textArea.addToAttribute('style', 'height: '+str(self.height)+'')
+        
+        if self.style:
+            textArea.addToAttribute('style', self.style)
+            
+        if self.disabled:
+            textArea.setAttribute('disabled', 'disabled')
+            
+        if self.readOnly:
+            textArea.setAttribute('readonly', 'readonly')
+        
+        if self.wrap:
+            textArea.setAttribute('wrap', self.wrap)
+            
+        if self.initialValue:
+            textArea.update(self.initialValue)
+        
+        div.insert(textArea)
+
+        # Add any description (optional)
+        div = self.insertComponentDescription(div)
+
+        # Add a tip (optional)
+        div = self.insertComponentTip(div)
+
+        return div.__str__()
        

@@ -48,6 +48,34 @@ import jformer
         #~ form = jformer.JFormer('login')
         #~ form.addJFormPage([])
 
+class TestSection(unittest.TestCase):
+    """Unit tests for jformer Page."""
+    
+    def test_doctests_jformpage(self):
+        """Run jformer doctests"""
+        doctest.testmod(jformer.section)
+        
+    def test_init(self):
+        section = jformer.Section('magic')
+        self.assertEqual(section.id, 'magic')
+        self.assertEqual(section._class, 'jFormSection')
+        self.assertEqual(section.style, '')
+        self.assertEqual(section.parentJFormPage, None)
+        self.assertEqual(section.jFormComponentArray, {})
+        self.assertEqual(section.data, None)
+        self.assertEqual(section.anonymous, False)
+        self.assertEqual(section.title, '')
+        self.assertEqual(section.titleClass, 'jFormSectionTitle')
+        self.assertEqual(section.description, '')
+        self.assertEqual(section.descriptionClass, 'jFormSectionDescription')
+        self.assertEqual(section.instanceOptions, None)
+        self.assertEqual(section.dependencyOptions, None)
+        self.assertEqual(section.errorMessageArray, {})
+        
+    #~ def test_jformer_add_page(self):
+        #~ form = jformer.JFormer('login')
+        #~ form.addJFormPage([])
+
 class TestElement(unittest.TestCase):
     """Unit tests for jformer Page."""
     
@@ -287,6 +315,39 @@ class TestComponent(unittest.TestCase):
         c.validationOptions = ['required', 'password']
         self.assertEqual(c.generateComponentLabel().__str__(),
             '<label id="magic-label" for="magic" class="jFormComponentLabel">Name:<span class="jFormComponentLabelRequiredStar"> *</span></label>')
+    
+    def test_insert_component_description(self):
+        from element import Element
+        c = jformer._Component()
+        setattr(c, 'id', 'magic')
+        div = Element('div', {})
+        div = c.insertComponentDescription(div)
+        self.assertEqual(div.__str__(), '<div></div>')
+        c.description = 'My description'
+        div = c.insertComponentDescription(div)
+        self.assertEqual(div.__str__(),
+            '<div><div id="magic-description" class="jFormComponentDescription">My description</div></div>')
+        
+    def test_insert_component_tip(self):
+        from element import Element
+        c = jformer._Component()
+        setattr(c, 'id', 'magic')
+        div = Element('div', {})
+        div = c.insertComponentTip(div)
+        self.assertEqual(div.__str__(), '<div></div>')
+        c.tip = 'Put on your best smile'
+        div = c.insertComponentTip(div)
+        self.assertEqual(div.__str__(),
+            '<div><div style="display: none" id="magic-tip" class="jFormComponentTip">Put on your best smile</div></div>')
+        
+    def test_required(self):
+        c = jformer._Component()
+        self.assertRaises(ValueError, c.required, {})
+        self.assertEqual(c.required({'value':None}), ['Required.'])
+        self.assertEqual(c.required({'value':''}), ['Required.'])
+        self.assertEqual(c.required({'value':'0'}), 'success')
+        self.assertEqual(c.required({'value':'magic'}), 'success')
+        
         
 class TestTextArea(unittest.TestCase):
     """Unit tests for jformer TextArea."""
@@ -295,11 +356,37 @@ class TestTextArea(unittest.TestCase):
         """Run jformer doctests"""
         doctest.testmod(jformer.textarea)
         
-    #~ def test_get_options(self):
-        #~ page = jformer.Page('house')
-        #~ options = page.getOptions()
-        #~ self.assertEqual({}, options)
-               
+    def test_init(self):
+        c = jformer.TextArea('magic', 'Magic Text Area')
+        self.assertEqual(c.id, 'magic')
+        self.assertEqual(c.label, 'Magic Text Area')
+    
+    def test_get_option_basic(self):
+        c = jformer.TextArea('magic', 'Magic Text Area')
+        self.assertEqual(c.getOptions(), {'type': 'jFormComponentTextArea'})
+        c.validationOptions = ['required', 'password']
+        self.assertEqual(c.getOptions(), {'type': 'jFormComponentTextArea',
+            'options': {'validationOptions': ['required', 'password']}})
+    
+    def test_get_option_extras(self):
+        c = jformer.TextArea('magic', 'Magic Text Area')
+        self.assertEqual(c.getOptions(), {'type': 'jFormComponentTextArea'})
+        c.allowTabbing = True
+        c.emptyValue = 'Enter some magic here'
+        c.autoGrow = True
+        self.assertEqual(c.getOptions(), {'type': 'jFormComponentTextArea',
+            'options': {'emptyValue': 'Enter some magic here',
+            'allowTabbing': True, 'autoGrow': True}})
+        
+    def test_str(self):
+        c = jformer.TextArea('magic', 'Magic Text Area')
+        self.assertEqual(c.__str__(), '<div id="magic-wrapper" ' +
+            'class="jFormComponent jFormComponentTextArea">' +
+            '<label id="magic-label" for="magic" '+
+            'class="jFormComponentLabel">Magic Text Area</label>' +
+            '<textarea class="textArea" name="magic" id="magic">' +
+            '</textarea></div>')
+    
         
 if __name__ == "__main__":
     unittest.main()

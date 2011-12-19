@@ -1,76 +1,55 @@
+'''
+A FormSection object contains FormComponent objects and belongs to a FormPage object
+'''
+class Section():
+    
+    def __init__(self, id, optionArray = {}, jFormComponentArray = []):
+        # Set the id
+        self.id = id
+        self._class = 'jFormSection'
+        self.style = ''
+        self.parentJFormPage = None
+        self.jFormComponentArray = {}
+        self.data = None
+        self.anonymous = False
+        
+        # Title, description, submit instructions
+        self.title = ''
+        self.titleClass = 'jFormSectionTitle'
+        self.description = ''
+        self.descriptionClass = 'jFormSectionDescription'
+        
+        # Options
+        self.instanceOptions = None
+        self.dependencyOptions = None
+        
+        # Validation
+        self.errorMessageArray = {}
+        
+        # Use the options hash to update object variables
+        if isinstance(optionArray, dict):
+            for option, value in optionArray.iteritems():
+                self.options[option] = value
+            
+        # Add the components from the constructor
+        self.addJFormComponentArray(jFormComponentArray)
 
-#~  * A FormSection object contains FormComponent objects and belongs to a FormPage object
-#~  */
-#class JFormSection:
 
-#~     # General settings
-#~     self.id
-#~     self.class = 'jFormSection'
-#~     self.style = ''
-#~     self.parentJFormPage
-#~     self.jFormComponentArray = {}
-#~     self.data
-#~     self.anonymous = false
+    def addJFormComponent(self, jFormComponent):
+        jFormComponent.parentJFormSection = self
+        self.jFormComponentArray.append(jFormComponent)
+        
 
-#~     # Title, description, submit instructions
-#~     self.title = ''
-#~     self.titleClass = 'jFormSectionTitle'
-#~     self.description = ''
-#~     self.descriptionClass = 'jFormSectionDescription'
+    def addJFormComponents(jFormComponents):
+        if isinstance(jFormComponents, list):
+            self.addJFormComponentArray(jFormComponents)
+        else:
+            self.addJFormComponent(jFormComponents)
 
-#~     # Options
-#~     self.instanceOptions = null
-#~     self.dependencyOptions = null
 
-#~     # Validation
-#~     self.errorMessageArray = {}
-
-#~     /*
-#~      * Constructor
-#~      */
-#~     def __construct(id, optionArray = {}, jFormComponentArray = {}):
-#~         # Set the id
-#~         self.id = id
-#~      
-#~         # Use the options hash to update object variables
-#~         if(is_array(optionArray)):
-#~             foreach(optionArray as option:value):
-#~                 self.{option = value
-#~             
-#~         
-
-#~         # Add the components from the constructor
-#~         self.addJFormComponentArray(jFormComponentArray)
-
-#~         return this
-#~     
-
-#~     def addJFormComponent(jFormComponent):
-#~         jFormComponent->parentJFormSection = this
-#~         self.jFormComponentArray[jFormComponent->id] = jFormComponent
-
-#~         return this
-#~     
-
-#~     def addJFormComponents(jFormComponents):
-#~         if (is_array(jFormComponents)):
-#~             foreach (jFormComponentArray as jFormComponent):
-#~                 jFormComponent->parentJFormSection = this
-#~                 self.addJFormComponent(jFormComponent)
-#~             
-#~          else:
-#~             jFormComponent->parentJFormSection = this
-#~             self.jFormComponentArray[jFormComponent->id] = jFormComponent
-#~         
-#~         return this
-#~     
-
-#~     def addJFormComponentArray(jFormComponentArray):
-#~         foreach(jFormComponentArray as jFormComponent):
-#~             self.addJFormComponent(jFormComponent)
-#~         
-#~         return this
-#~     
+    def addJFormComponentArray(self, jFormComponentArray):
+        for jFormComponent in jFormComponentArray:
+            self.addJFormComponent(jFormComponent)
 
 #~     def getData():
 #~         self.data = {}
@@ -208,13 +187,9 @@
 #~         
 
 #~         return options
-#~     
 
-#~     /**
-#~      *
-#~      * @return string
-#~      */
-#~     def __toString():
+
+#~     def __str__(self):
 #~         # Section fieldset
 #~         jFormSectionDiv = new JFormElement('div', array(
 #~             'id':self.id,
@@ -253,9 +228,3 @@
 #~         # Add the form sections to the page
 #~         foreach(self.jFormComponentArray as jFormComponentArray):
 #~             jFormSectionDiv->insert(jFormComponentArray)
-#~         
-#~         
-#~         return jFormSectionDiv->__toString()
-#~     
-
-?>

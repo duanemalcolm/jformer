@@ -213,13 +213,6 @@ class _Component():
     def hasInstanceValues(self):
         return isinstance(self.value, list)
     
-
-#     /**
-#      * Generates the HTML for the FormComponent
-#      * @return string
-#      */
-#     abstract def __toString()
-    
     def generateComponentDiv(self, includeLabel=True):
         # Div tag contains everything about the component
         componentDiv = Element('div', {
@@ -267,40 +260,37 @@ class _Component():
 
         return label
 
-#~     def insertComponentDescription(div):
-#~         # Description
-#~         if(!empty(self.description)):
-#~             description = new JFormElement('div', array(
-#~                 'id':self.id.'-description',
-#~                 'class':self.descriptionClass
-#~             ))
-#~             description.update(self.description)
-#
-#~             div.insert(description)
-#~         
-#
-#~         return div
-#~     
-#
-#~     def insertComponentTip(div):
-#~         # Create the tip div if not empty
-#~         if(!empty(self.tip)):
-#~             tipDiv = new JFormElement('div', array(
-#~                 'id':self.id.'-tip',
-#~                 'style':'display: none',
-#~                 'class':self.tipClass,
-#~             ))
-#~             tipDiv.update(self.tip)
-#~             div.insert(tipDiv)
-#~         
-#
-#~         return div
-#~     
-#
-#~     # Generic validations
-#
-#~     def required(options): # Just override this if necessary
-#~         messageArray = array('Required.')
-#~         #return empty(options['value']) ? 'success' : messageArray # Break validation on purpose
-#~         return !empty(options['value']) || options['value'] == '0' ? 'success' : messageArray
+    def insertComponentDescription(self, div):
+        # Description
+        if self.description:
+            description = Element('div', {
+                'id':self.id+'-description',
+                'class':self.descriptionClass
+                })
+            description.update(self.description)
+            div.insert(description)
+        return div
+    
+    def insertComponentTip(self, div):
+        # Create the tip div if not empty
+        if self.tip:
+            tipDiv = Element('div', {
+                'id':self.id+'-tip',
+                'style':'display: none',
+                'class':self.tipClass,
+                })
+            tipDiv.update(self.tip)
+            div.insert(tipDiv)
+        return div
+    
+    # Generic validations
+    def required(self, options): # Just override this if necessary
+        messageArray = ['Required.']
+        #return empty(options['value']) ? 'success' : messageArray # Break validation on purpose
+        if not options.has_key('value'):
+            raise ValueError('Options does not contain a value entry')
+        if options['value'] or options['value'] == '0':
+            return 'success'
+        else:
+            return messageArray
 
